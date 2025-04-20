@@ -15,10 +15,11 @@ import {
   LinearProgress,
   InputAdornment,
   IconButton,
+  SelectChangeEvent,
 } from '@mui/material';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth,db } from '../firebase';
-import {  doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db } from '../firebase';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import EmailIcon from '@mui/icons-material/Email';
@@ -59,11 +60,15 @@ const Signup = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>
-  ) => {
-    const name = e.target.name as string;
-    const value = e.target.value as string;
+  // Handle input changes (for TextField)
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+  };
+
+  // Handle select changes (for Select dropdown)
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+    const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
 
@@ -88,11 +93,11 @@ const Signup = () => {
       setError('รหัสผ่านควรมีอย่างน้อย 8 ตัว มี A-Z, a-z, ตัวเลข และอักขระพิเศษ');
       return;
     }
-  
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password);
       const user = userCredential.user;
-  
+
       // บันทึกข้อมูลเพิ่มเติมลง Firestore
       await setDoc(doc(db, 'users', user.uid), {
         firstName: form.firstName,
@@ -103,13 +108,12 @@ const Signup = () => {
         email: form.email,
         createdAt: serverTimestamp(),
       });
-  
+
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message);
     }
   };
-  
 
   const toggleShowPassword = () => {
     setShowPassword((prev) => !prev);
@@ -148,42 +152,42 @@ const Signup = () => {
 
         <Grid container spacing={2}>
           {/* First Name + Last Name */}
-          <Grid item xs={12} sm={6} sx={{ textAlign: 'left' }}>
+          <Grid item xs={12} sm={6} sx={{ textAlign: 'left' }} {...({} as any)}>
             <TextField
               label="ชื่อ"
               name="firstName"
               value={form.firstName}
-              onChange={handleChange}
+              onChange={handleInputChange} // Use handleInputChange
               fullWidth
             />
           </Grid>
-          <Grid item xs={12} sm={6} sx={{ textAlign: 'right' }}>
+          <Grid item xs={12} sm={6} sx={{ textAlign: 'right' }} {...({} as any)}>
             <TextField
               label="นามสกุล"
               name="lastName"
               value={form.lastName}
-              onChange={handleChange}
+              onChange={handleInputChange} // Use handleInputChange
               fullWidth
             />
           </Grid>
 
           {/* Station + Province */}
-          <Grid item xs={12} sm={6} >
+          <Grid item xs={12} sm={6} {...({} as any)}>
             <TextField
               label="ชื่อสถานตรวจสภาพรถ"
               name="stationName"
               fullWidth
               value={form.stationName}
-              onChange={handleChange}
+              onChange={handleInputChange} // Use handleInputChange
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={6} {...({} as any)}>
             <FormControl sx={{ width: '15vh' }}>
               <InputLabel>จังหวัด</InputLabel>
               <Select
                 name="province"
                 value={form.province}
-                onChange={handleChange}
+                onChange={handleSelectChange} // Use handleSelectChange
                 label="จังหวัด"
               >
                 {provinces.map((province) => (
@@ -196,7 +200,7 @@ const Signup = () => {
           </Grid>
 
           {/* Contact */}
-          <Grid item xs={12}>
+          <Grid item xs={12} {...({} as any)}>
             <TextField
               label="เบอร์โทร"
               name="contact"
@@ -204,12 +208,12 @@ const Signup = () => {
               fullWidth
               placeholder="08xxxxxxxx"
               value={form.contact}
-              onChange={handleChange}
+              onChange={handleInputChange} // Use handleInputChange
             />
           </Grid>
 
           {/* Email */}
-          <Grid item xs={12}>
+          <Grid item xs={12} {...({} as any)}>
             <TextField
               label="อีเมล"
               name="email"
@@ -217,7 +221,7 @@ const Signup = () => {
               fullWidth
               placeholder="example@email.com"
               value={form.email}
-              onChange={handleChange}
+              onChange={handleInputChange} // Use handleInputChange
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -229,14 +233,14 @@ const Signup = () => {
           </Grid>
 
           {/* Password */}
-          <Grid item xs={12}>
+          <Grid item xs={12} {...({} as any)}>
             <TextField
               label="รหัสผ่าน"
               name="password"
               type={showPassword ? 'text' : 'password'}
               fullWidth
               value={form.password}
-              onChange={handleChange}
+              onChange={handleInputChange} // Use handleInputChange
               helperText="รหัสผ่านต้องมี A-Z, a-z, ตัวเลข และอักขระพิเศษ อย่างน้อย 8 ตัว"
               InputProps={{
                 startAdornment: (
@@ -246,10 +250,7 @@ const Signup = () => {
                 ),
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton
-                      onClick={toggleShowPassword}
-                      edge="end"
-                    >
+                    <IconButton onClick={toggleShowPassword} edge="end">
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>

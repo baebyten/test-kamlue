@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Typography, Container, AppBar, Toolbar, Button, CircularProgress } from '@mui/material';
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import { useNavigate } from 'react-router-dom';
