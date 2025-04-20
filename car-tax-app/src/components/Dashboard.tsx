@@ -20,8 +20,8 @@ const fetchUserData = async (email: string) => {
 
 
 // ดึงข้อมูลใบเสร็จ
-const fetchReceiptData = async () => {
-  const q = query(collection(db, "receipts"));
+const fetchReceiptData = async (uid: string) => {
+  const q = query(collection(db, "receipts"), where("uid", "==", uid));
   const querySnapshot = await getDocs(q);
 
   let compulsoryInsurance = 0;
@@ -30,28 +30,19 @@ const fetchReceiptData = async () => {
 
   querySnapshot.forEach((doc) => {
     const data = doc.data();
-    console.log("🚘 Receipt:", data);
-
-    // คำนวณ compulsoryInsurance จากฟิลด์ในฐานข้อมูล
     compulsoryInsurance += parseFloat(data.compulsoryInsurance || 0);
-
-    // คำนวณ optionalInsurance จากฟิลด์ other
     optionalInsurance += parseFloat(data.other || 0);
 
-    // ตรวจสอบ vehicleType ว่าเป็น รย.1, รย.2, รย.3 หรือ รย.12
     const type = (data.vehicleType || '').replace(/\s|\./g, '').toLowerCase();
-
     if (type === 'รย1') inspections.r1 += 1;
     else if (type === 'รย2') inspections.r2 += 1;
     else if (type === 'รย3') inspections.r3 += 1;
     else if (type === 'รย12') inspections.r12 += 1;
   });
 
-  console.log("📊 Insurance Total:", compulsoryInsurance, optionalInsurance);
-  console.log("📊 Inspection Count:", inspections);
-
   return { compulsoryInsurance, optionalInsurance, inspections };
 };
+
 
 
 

@@ -16,7 +16,7 @@ import {
   import { useNavigate } from 'react-router-dom';
   import { useState } from 'react';
   import { addDoc, collection } from 'firebase/firestore';
-  import { db } from '../firebase';
+  import { auth, db } from '../firebase';
   
   const Receipt = () => {
     const navigate = useNavigate();
@@ -82,6 +82,7 @@ import {
   
         // บันทึกข้อมูลใหม่ใน Firestore
         await addDoc(collection(db, 'receipts'), {
+          uid: auth.currentUser?.uid,
           fullName: form.fullName,
           licensePlate: form.licensePlate,
           vehicleType: form.vehicleType,
