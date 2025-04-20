@@ -1,8 +1,7 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: 'kamluetest',  // กำหนด URL ที่ต้องการ
-})
+  base: 'https://car-tax-app-d650a.web.app/', // เปลี่ยนให้ตรงกับเส้นทางที่คุณ deploy
+});
